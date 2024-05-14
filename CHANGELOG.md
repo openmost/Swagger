@@ -1,3 +1,5 @@
 ## Changelog
 
-Here goes the changelog text.
+### v0.1.0
+
+setup: Plugin files

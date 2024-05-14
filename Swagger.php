@@ -10,18 +10,5 @@ namespace Piwik\Plugins\Swagger;
 
 class Swagger extends \Piwik\Plugin
 {
-    public function registerEvents()
-    {
-        return [
-            'CronArchive.getArchivingAPIMethodForPlugin' => 'getArchivingAPIMethodForPlugin',
-        ];
-    }
 
-    // support archiving just this plugin via core:archive
-    public function getArchivingAPIMethodForPlugin(&$method, $plugin)
-    {
-        if ($plugin == 'Swagger') {
-            $method = 'Swagger.getExampleArchivedMetric';
-        }
-    }
 }
