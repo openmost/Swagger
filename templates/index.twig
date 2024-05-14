@@ -1,7 +1,26 @@
 {% extends 'admin.twig' %}
 
 {% block content %}
+    <script>
+      function resizeIframe(obj) {
+        setInterval(() => {
+          obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px';
+        }, 500);
+      }
+    </script>
 
-    <div vue-entry="Swagger.SwaggerIndexPage"></div>
+    <div class="swagger-page-wrapper">
+        <iframe src="/index.php?module=Swagger&action=iframe" width="100%" onload="resizeIframe(this);"></iframe>
+    </div>
 
+    <style>
+        .swagger-page-wrapper {
+            display: flex;
+        }
+
+        .swagger-page-wrapper iframe {
+            width: 100%;
+            min-height: 500px;
+        }
+    </style>
 {% endblock %}

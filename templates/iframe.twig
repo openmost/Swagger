@@ -1,0 +1,29 @@
+<div id="swagger-ui"></div>
+
+<!-- Load Swagger UI styles -->
+<link rel="stylesheet" href="/plugins/Swagger/swagger-ui/dist/swagger-ui.css">
+
+<!-- Load Swagger UI scripts -->
+<script src="/plugins/Swagger/swagger-ui/dist/swagger-ui-bundle.js"></script>
+<script src="/plugins/Swagger/swagger-ui/dist/swagger-ui-standalone-preset.js"></script>
+
+<!-- Init Swagger UI -->
+<script>
+  window.onload = () => {
+    window.ui = SwaggerUIBundle({
+      url: '{{ openapi_url|raw }}',
+      dom_id: '#swagger-ui',
+      presets: [
+        SwaggerUIBundle.presets.apis,
+        SwaggerUIStandalonePreset
+      ],
+      layout: "StandaloneLayout",
+    });
+  };
+</script>
+
+<style>
+    body {
+        margin: 0;
+    }
+</style>

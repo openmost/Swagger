@@ -4,6 +4,8 @@ namespace Piwik\Plugins\Swagger;
 
 use Piwik\API\Proxy;
 use Piwik\API\Request;
+use Piwik\Piwik;
+use Piwik\Url;
 
 class API extends \Piwik\Plugin\API
 {
@@ -21,6 +23,8 @@ class API extends \Piwik\Plugin\API
 
     public function getOpenApi()
     {
+        // Piwik::checkUserHasSuperUserAccess();
+
         $openapi = [
             "openapi" => "3.1.0",
             "info" => $this->getInfo(),
@@ -48,7 +52,7 @@ class API extends \Piwik\Plugin\API
     }
 
 
-    public function getMetadata()
+    private function getMetadata()
     {
         return Proxy::getInstance()->getMetadata();
     }
@@ -76,7 +80,7 @@ class API extends \Piwik\Plugin\API
         return $result;
     }
 
-    public function getInfo()
+    private function getInfo()
     {
         $info = [
             "title" => "Matomo API",
@@ -88,19 +92,25 @@ class API extends \Piwik\Plugin\API
         return $info;
     }
 
-    public function getExternalDocs()
+    private function getExternalDocs()
     {
         $externalDocs = [
-            "description" => "Official Matomo doc",
+            "description" => "Official Matomo documentation",
             "url" => "https://developer.matomo.org/api-reference/reporting-api"
         ];
 
         return $externalDocs;
     }
 
-    public function getServers()
+    private function getServers()
     {
+        $host = Url::getHost('demo.matomo.cloud');
+
         $servers = [
+            [
+                "url" => "https://$host",
+                "description" => "This Matomo server",
+            ],
             [
                 "url" => "https://demo.matomo.cloud/",
                 "description" => "The Matomo demo server",
@@ -110,20 +120,20 @@ class API extends \Piwik\Plugin\API
         return $servers;
     }
 
-    public function getTags()
+    private function getTags()
     {
         $tags = [];
         foreach (Proxy::getInstance()->getMetadata() as $class => $info) {
             $tags[] = [
                 'name' => Proxy::getInstance()->getModuleNameFromClassName($class),
-                'description' => isset($info['__documentation']) ? $info['__documentation'] : '',
+                //'description' => isset($info['__documentation']) ? $info['__documentation'] : '',
             ];
         }
 
         return $tags;
     }
 
-    public function getPaths()
+    private function getPaths()
     {
         $paths = [];
 
@@ -151,7 +161,7 @@ class API extends \Piwik\Plugin\API
         return $paths;
     }
 
-    public function getRequiredProperties($method)
+    private function getRequiredProperties($method)
     {
         $required = [];
 
@@ -166,9 +176,44 @@ class API extends \Piwik\Plugin\API
         return $required;
     }
 
-    public function getProperties($method)
+    private function getProperties($method)
     {
-        $properties = [];
+        $properties = [
+            "module" => [
+                "name" => "module",
+                "in" => "query",
+                "examples" => ["API"],
+                "schema" => [
+                    "type" => "string",
+                ]
+            ],
+            "format" => [
+                "name" => "format",
+                "in" => "query",
+                "examples" => [
+                    "json",
+                    "xml",
+                    "csv",
+                    "tsv",
+                    "html",
+                    "rss",
+                    "original"
+                ],
+                "schema" => [
+                    "type" => "string",
+                ]
+            ],
+            "method" => [
+                "name" => "method",
+                "in" => "query",
+                "examples" => [
+                    $method["method"]
+                ],
+                "schema" => [
+                    "type" => "string",
+                ]
+            ],
+        ];
 
         if (isset($method['parameters'])) {
             foreach ($method['parameters'] as $parameter => $config) {

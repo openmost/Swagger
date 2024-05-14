@@ -2,4 +2,4 @@
 
 ### v0.1.0
 
-setup: Plugin files
+setup: Plugin base

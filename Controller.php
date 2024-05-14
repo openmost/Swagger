@@ -25,12 +25,20 @@ class Controller extends \Piwik\Plugin\Controller
 
     public function index()
     {
-        $openapi = \Piwik\API\Request::processRequest('Swagger.getOpenApi', array());
+        Piwik::checkUserHasSuperUserAccess();
 
-        // Render the Twig template templates/index.twig and assign the view variable answerToLife to the view.
-        return $this->renderTemplate('index', array(
-            'openapi' => $openapi,
+        return $this->renderTemplate('index');
+
+    }
+
+    public function iframe()
+    {
+        Piwik::checkUserHasSuperUserAccess();
+
+        $openapi_url = "/index.php?module=API&format=json&method=Swagger.getOpenApi";
+
+        return $this->renderTemplate('iframe', array(
+            'openapi_url' => $openapi_url,
         ));
-
     }
 }
