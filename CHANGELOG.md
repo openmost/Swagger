@@ -1,5 +1,9 @@
 ## Changelog
 
+### v5.1.4
+
+update: marketplace cover
+
 ### v5.1.3
 
 update: marketplace category and cover
