@@ -27,7 +27,10 @@ class Controller extends \Piwik\Plugin\Controller
     {
         Piwik::checkUserHasSuperUserAccess();
 
-        return $this->renderTemplate('index');
+        return $this->renderTemplate('index', array(
+            'title' => 'Swagger',
+            'categoryTitle' => 'Administration'
+        ));
 
     }
 

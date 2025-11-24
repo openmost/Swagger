@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(C:wamp64wwwmatomopluginsCoreHomeController.php)",
+      "Bash(title C:wamp64wwwmatomopluginsCustomReportsController.php)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

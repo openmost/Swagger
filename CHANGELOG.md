@@ -1,6 +1,10 @@
 ## Changelog
 
-## v5.2.1
+### v5.2.2
+
+update: Swagger admin page title
+
+### v5.2.1
 
 fix: CSP issue
 
