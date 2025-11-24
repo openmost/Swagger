@@ -35,7 +35,8 @@ class Controller extends \Piwik\Plugin\Controller
     {
         Piwik::checkUserHasSuperUserAccess();
 
-        $openapi_url = "/index.php?module=API&format=json&method=Swagger.getOpenApi";
+        // Use absolute URL to avoid CORS issues
+        $openapi_url = \Piwik\Url::getCurrentUrlWithoutFileName() . "?module=API&format=json&method=Swagger.getOpenApi";
 
         return $this->renderTemplate('iframe', array(
             'openapi_url' => $openapi_url,
