@@ -9,6 +9,7 @@ return array(
         }
 
         $previous->addPolicy('img-src', 'validator.swagger.io');
+        $previous->addPolicy('frame-src', "'self'");
         return $previous;
     }),
 );

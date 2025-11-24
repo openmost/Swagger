@@ -1,5 +1,9 @@
 ## Changelog
 
+## v5.2.1
+
+fix: CSP issue
+
 ### v5.2.0
 
 **Major Release: Full OpenAPI 3.1.0 Compliance & Dynamic API Discovery**

@@ -3,14 +3,19 @@
 {% block content %}
     <script>
       function resizeIframe(obj) {
-        setInterval(() => {
-          obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px';
-        }, 500);
+        try {
+          setInterval(() => {
+            obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px';
+          }, 500);
+        } catch(e) {
+          // If cross-origin access is blocked, fallback to fixed height
+          console.log('Unable to auto-resize iframe:', e);
+        }
       }
     </script>
 
     <div class="swagger-page-wrapper">
-        <iframe src="/index.php?module=Swagger&action=iframe" width="100%" onload="resizeIframe(this);"></iframe>
+        <iframe src="index.php?module=Swagger&action=iframe" width="100%" onload="resizeIframe(this);"></iframe>
     </div>
 
     <style>
