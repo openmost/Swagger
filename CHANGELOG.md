@@ -1,5 +1,9 @@
 ## Changelog
 
+### v5.2.3
+
+fix: Authorization modal position in iframe view
+
 ### v5.2.2
 
 update: Swagger admin page title
