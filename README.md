@@ -15,6 +15,11 @@ It is designed for developers integrating against Matomo, support engineers debu
 - Bearer token authentication that mirrors how Matomo expects API tokens to be sent today (the deprecated `token_auth` query parameter is not used).
 - POST as the default verb for every endpoint, so the plugin keeps working even when your token is restricted to POST-only.
 - Method names visible inside endpoint paths, so the operation list reads like a table of contents instead of a wall of identical URLs.
+- Tags annotated with each plugin's own description and homepage link, so you can tell at a glance what a module does.
+- Parameter schemas typed from the real PHP signatures (`int`, `bool`, `array`, …) rather than treated as strings, with `nullable` flagged where it applies.
+- Domain-aware schemas for the parameters that have a Matomo-specific shape: `period` is an enum, `idSite`/`idSites` accept "1" / "1,2,3" / "all" via a regex, `date` documents its relative-keyword and range syntax, `segment` and `language` carry usable descriptions.
+- Responses describe every format Matomo can return (`json`, `xml`, `csv`, `tsv`, `html`, `rss`, `original`), making the OpenAPI document accurate when imported into client generators.
+- Per-method request body examples generated from Matomo's reference documentation generator — "Try it out" opens prefilled with sensible defaults instead of an empty form.
 
 ## Requirements
 

@@ -2,6 +2,7 @@
 
 namespace Piwik\Plugins\Swagger;
 
+use Piwik\API\DocumentationGenerator;
 use Piwik\API\Proxy;
 use Piwik\API\Request;
 use Piwik\Piwik;
@@ -29,25 +30,18 @@ class API extends \Piwik\Plugin\API
 
     public function getOpenApi()
     {
-       // Piwik::checkUserHasSuperUserAccess();
+        // Piwik::checkUserHasSuperUserAccess();
 
-        // Ensure all plugins are registered before generating the spec
         $this->ensureAllPluginsRegistered();
 
         try {
-            $info = $this->getInfo();
-            $externalDocs = $this->getExternalDocs();
-            $servers = $this->getServers();
-            $tags = $this->getTags();
-            $paths = $this->getPaths();
-
             $openapi = [
                 "openapi" => "3.1.0",
-                "info" => $info,
-                "externalDocs" => $externalDocs,
-                "servers" => $servers,
-                "tags" => $tags,
-                "paths" => $paths,
+                "info" => $this->getInfo(),
+                "externalDocs" => $this->getExternalDocs(),
+                "servers" => $this->getServers(),
+                "tags" => $this->getTags(),
+                "paths" => $this->getPaths(),
                 "components" => [
                     "securitySchemes" => [
                         "BearerAuth" => [
@@ -65,7 +59,7 @@ class API extends \Piwik\Plugin\API
             ];
 
             return $openapi;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return [
                 "openapi" => "3.1.0",
                 "info" => [
@@ -75,19 +69,8 @@ class API extends \Piwik\Plugin\API
                 ],
                 "paths" => []
             ];
-        } catch (\Throwable $e) {
-            return [
-                "openapi" => "3.1.0",
-                "info" => [
-                    "title" => "Matomo API - Fatal Error",
-                    "version" => "1.0.0",
-                    "description" => "Fatal error: " . $e->getMessage() . " | File: " . $e->getFile() . " | Line: " . $e->getLine()
-                ],
-                "paths" => []
-            ];
         }
     }
-
 
     private function getMetadata()
     {
@@ -108,7 +91,6 @@ class API extends \Piwik\Plugin\API
         return null;
     }
 
-
     private function getAllApiMethods()
     {
         $result = array();
@@ -116,60 +98,57 @@ class API extends \Piwik\Plugin\API
         foreach (Proxy::getInstance()->getMetadata() as $class => $info) {
             $moduleName = Proxy::getInstance()->getModuleNameFromClassName($class);
             foreach ($info as $actionName => $infoMethod) {
-                if ($actionName !== '__documentation' && $actionName !== 'usesAutoSanitizeInputParams') {
-                    $method = "$moduleName.$actionName";
-                    $result[$method] = array(
-                        'module' => $moduleName,
-                        'action' => $actionName,
-                        'method' => $method,
-                        'parameters' => isset($infoMethod['parameters']) ? $infoMethod['parameters'] : array(),
-                        'isDeprecated' => isset($infoMethod['isDeprecated']) ? $infoMethod['isDeprecated'] : false,
-                    );
+                if ($actionName === '__documentation' || $actionName === 'usesAutoSanitizeInputParams') {
+                    continue;
                 }
+                $method = "$moduleName.$actionName";
+                $result[$method] = array(
+                    'class' => $class,
+                    'module' => $moduleName,
+                    'action' => $actionName,
+                    'method' => $method,
+                    'parameters' => isset($infoMethod['parameters']) ? $infoMethod['parameters'] : array(),
+                    'isDeprecated' => isset($infoMethod['isDeprecated']) ? $infoMethod['isDeprecated'] : false,
+                );
             }
         }
 
         return $result;
     }
 
-    /**
-     * Get OpenAPI info section with dynamic Matomo version
-     *
-     * @return array
-     */
     private function getInfo()
     {
-        $info = [
+        return [
             "title" => "Matomo API",
             "summary" => "Matomo reporting API",
-            "description" => "Complete Matomo reporting API documentation",
-            "version" => Version::VERSION  // Dynamically retrieved from Matomo installation
+            "description" => "Complete Matomo reporting API documentation, dynamically generated from the activated plugins on this Matomo installation.",
+            "version" => Version::VERSION,
+            "contact" => [
+                "name" => "Openmost",
+                "url" => "https://openmost.io/products/swagger/",
+                "email" => "ronan@openmost.io",
+            ],
+            "license" => [
+                "name" => "GPL v3+",
+                "url" => "https://www.gnu.org/licenses/gpl-3.0.html",
+            ],
         ];
-
-        return $info;
     }
 
     private function getExternalDocs()
     {
-        $externalDocs = [
+        return [
             "description" => "Official Matomo documentation",
             "url" => "https://developer.matomo.org/api-reference/reporting-api"
         ];
-
-        return $externalDocs;
     }
 
-    /**
-     * Get OpenAPI servers list with dynamic protocol detection
-     *
-     * @return array
-     */
     private function getServers()
     {
         $host = Url::getHost();
         $scheme = Url::getCurrentScheme();
 
-        $servers = [
+        return [
             [
                 "url" => "$scheme://$host",
                 "description" => "This Matomo server",
@@ -179,27 +158,30 @@ class API extends \Piwik\Plugin\API
                 "description" => "The Matomo demo server",
             ]
         ];
-
-        return $servers;
     }
 
-    /**
-     * Generate OpenAPI tags dynamically from installed plugins
-     *
-     * This method generates tags based on the loaded plugins in Matomo,
-     * ensuring all modules are discovered dynamically from the current installation.
-     *
-     * @return array Array of tag definitions with module names
-     */
     private function getTags()
     {
         $tags = [];
 
         foreach (Proxy::getInstance()->getMetadata() as $class => $info) {
             $moduleName = Proxy::getInstance()->getModuleNameFromClassName($class);
-            $tag = [
-                'name' => $moduleName,
-            ];
+            $tag = ['name' => $moduleName];
+
+            if (isset($info['__documentation']) && is_string($info['__documentation'])) {
+                $description = trim(strip_tags($info['__documentation']));
+                if ($description !== '') {
+                    $tag['description'] = $description;
+                }
+            }
+
+            $pluginInfo = $this->getPluginInformation($moduleName);
+            if (!empty($pluginInfo['homepage'])) {
+                $tag['externalDocs'] = [
+                    'description' => 'Plugin homepage',
+                    'url' => $pluginInfo['homepage'],
+                ];
+            }
 
             $tags[] = $tag;
         }
@@ -207,24 +189,16 @@ class API extends \Piwik\Plugin\API
         return $tags;
     }
 
-    /**
-     * Generate OpenAPI paths dynamically from all available API methods
-     *
-     * This method generates API paths based on all registered API methods from loaded plugins.
-     * It includes proper OpenAPI 3.1.0 structure with parameters, responses, and documentation.
-     *
-     * @return array Array of path definitions
-     */
     private function getPaths()
     {
         $paths = [];
-        $metadata = $this->getMetadata(); // Get metadata once, not in every iteration
+        $metadata = $this->getMetadata();
+        $documentationGenerator = $this->buildDocumentationGenerator();
 
         foreach ($this->getAllApiMethods() as $method) {
             $operationId = str_replace('.', '_', $method['method']);
             $summary = $method['action'] . ' from ' . $method['module'];
 
-            // Get method documentation if available from API metadata
             $description = '';
             foreach ($metadata as $class => $info) {
                 if (Proxy::getInstance()->getModuleNameFromClassName($class) === $method['module']) {
@@ -235,47 +209,40 @@ class API extends \Piwik\Plugin\API
                 }
             }
 
-            // Build path with method in query string for clarity
+            $properties = $this->getPostBodyProperties($method);
+            $required = $this->getRequiredProperties($method);
+            $example = $this->buildRequestBodyExample($method, $documentationGenerator);
+
+            $bodySchema = [
+                "type" => "object",
+                "required" => $required,
+                "properties" => $properties,
+            ];
+
+            $bodyContent = [
+                "schema" => $bodySchema,
+            ];
+            if ($example !== null) {
+                $bodyContent["example"] = $example;
+            }
+
             $pathKey = '/index.php?method=' . $method['method'];
             $paths[$pathKey] = [
                 "post" => [
                     "summary" => $summary,
                     "description" => $description ?: "Execute " . $method['method'] . " API method",
                     "operationId" => $operationId,
-                    "tags" => [
-                        $method['module'],
-                    ],
+                    "tags" => [$method['module']],
                     "deprecated" => $method['isDeprecated'],
                     "requestBody" => [
                         "required" => false,
                         "content" => [
-                            "application/x-www-form-urlencoded" => [
-                                "schema" => [
-                                    "type" => "object",
-                                    "required" => ["module", "format"],
-                                    "properties" => $this->getPostBodyProperties($method)
-                                ]
-                            ],
-                            "application/json" => [
-                                "schema" => [
-                                    "type" => "object",
-                                    "required" => ["module", "format"],
-                                    "properties" => $this->getPostBodyProperties($method)
-                                ]
-                            ]
+                            "application/x-www-form-urlencoded" => $bodyContent,
+                            "application/json" => $bodyContent,
                         ]
                     ],
                     "responses" => [
-                        "200" => [
-                            "description" => "Successful response",
-                            "content" => [
-                                "application/json" => [
-                                    "schema" => [
-                                        "type" => "object"
-                                    ]
-                                ]
-                            ]
-                        ]
+                        "200" => $this->buildSuccessResponse(),
                     ]
                 ],
             ];
@@ -284,109 +251,96 @@ class API extends \Piwik\Plugin\API
         return $paths;
     }
 
+    private function buildDocumentationGenerator()
+    {
+        try {
+            return new DocumentationGenerator();
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    private function buildRequestBodyExample($method, $documentationGenerator)
+    {
+        if (!$documentationGenerator) {
+            return null;
+        }
+
+        try {
+            $exampleUrl = $documentationGenerator->getExampleUrl($method['class'], $method['action']);
+        } catch (\Throwable $e) {
+            return null;
+        }
+
+        if (!is_string($exampleUrl) || $exampleUrl === '') {
+            return null;
+        }
+
+        $query = ltrim($exampleUrl, '?');
+        parse_str($query, $exampleParams);
+
+        unset($exampleParams['token_auth']);
+
+        if (empty($exampleParams)) {
+            return null;
+        }
+
+        if (!isset($exampleParams['format'])) {
+            $exampleParams['format'] = 'json';
+        }
+
+        return $exampleParams;
+    }
+
     private function getRequiredProperties($method)
     {
-        $required = [];
+        $required = ['module', 'format'];
 
-        if (isset($method['parameters'])) {
-            foreach ($method['parameters'] as $parameter => $config) {
-                if ($config['default'] === is_object('Piwik\API\NoDefaultValue')) {
-                    $required[] = $parameter;
-                }
+        if (!isset($method['parameters'])) {
+            return $required;
+        }
+
+        foreach ($method['parameters'] as $parameter => $config) {
+            if (strpos($parameter, '_') === 0) {
+                continue;
+            }
+            if ($this->isRequiredParameter($config)) {
+                $required[] = $parameter;
             }
         }
 
         return $required;
     }
 
-    /**
-     * Generate OpenAPI parameter definitions for a specific API method
-     *
-     * Converts Matomo API method parameters into OpenAPI 3.1.0 parameter format,
-     * including proper types, required flags, descriptions, and default values.
-     *
-     * @param array $method Method information including parameters
-     * @return array Array of parameter definitions
-     */
-    private function getParametersArray($method)
+    private function isRequiredParameter($config)
     {
-        $parameters = [
-            [
-                "name" => "method",
-                "in" => "query",
-                "required" => true,
-                "description" => "API method to call",
-                "schema" => [
-                    "type" => "string",
-                    "example" => $method["method"]
-                ]
-            ],
-            [
-                "name" => "format",
-                "in" => "query",
-                "required" => false,
-                "description" => "Response format",
-                "schema" => [
-                    "type" => "string",
-                    "enum" => ["json", "xml", "csv", "tsv", "html", "rss", "original"],
-                    "default" => "json"
-                ]
-            ],
-        ];
-
-        if (isset($method['parameters'])) {
-            foreach ($method['parameters'] as $parameter => $config) {
-                // Check if parameter is required (has NoDefaultValue or no default at all)
-                $hasDefault = isset($config['default']);
-                $isNoDefaultValue = $hasDefault && is_object($config['default']) &&
-                                   get_class($config['default']) === 'Piwik\API\NoDefaultValue';
-                $isRequired = !$hasDefault || $isNoDefaultValue;
-
-                $param = [
-                    'name' => $parameter,
-                    'in' => 'query',
-                    'required' => $isRequired,
-                    'schema' => [
-                        'type' => 'string',
-                    ]
-                ];
-
-                // Add description if available and not a translation key
-                if (isset($config['description']) &&
-                    !empty($config['description']) &&
-                    !preg_match('/^[A-Z][a-zA-Z]+_[a-zA-Z_]+$/', $config['description'])) {
-                    $param['description'] = $config['description'];
-                }
-
-                // Add default value: use meaningful value if exists, otherwise empty string for optional params
-                if ($hasDefault &&
-                    !is_object($config['default']) &&
-                    $config['default'] !== null &&
-                    trim((string)$config['default']) !== '' &&
-                    strtolower(trim((string)$config['default'])) !== 'string') {
-                    // Has a meaningful default value
-                    $param['schema']['default'] = $config['default'];
-                } elseif (!$isRequired) {
-                    // Optional parameter with no meaningful default - set empty string
-                    $param['schema']['default'] = '';
-                }
-
-                $parameters[] = $param;
-            }
+        if (!array_key_exists('default', $config)) {
+            return true;
         }
-
-        return $parameters;
+        return is_object($config['default'])
+            && get_class($config['default']) === 'Piwik\\API\\NoDefaultValue';
     }
 
-    /**
-     * Generate OpenAPI POST body properties for a specific API method
-     *
-     * Creates properties for request body parameters in POST requests.
-     * Includes format parameter and all method-specific parameters.
-     *
-     * @param array $method Method information including parameters
-     * @return array Array of property definitions for request body
-     */
+    private function mapPhpTypeToOpenApi($phpType)
+    {
+        switch ($phpType) {
+            case 'int':
+            case 'integer':
+                return 'integer';
+            case 'bool':
+            case 'boolean':
+                return 'boolean';
+            case 'float':
+            case 'double':
+                return 'number';
+            case 'array':
+                return 'array';
+            case 'string':
+            default:
+                return 'string';
+        }
+    }
+
     private function getPostBodyProperties($method)
     {
         $properties = [
@@ -404,98 +358,174 @@ class API extends \Piwik\Plugin\API
             ],
         ];
 
-        if (isset($method['parameters'])) {
-            foreach ($method['parameters'] as $parameter => $config) {
-                // Check if parameter is required (has NoDefaultValue or no default at all)
-                $hasDefault = isset($config['default']);
-                $isNoDefaultValue = $hasDefault && is_object($config['default']) &&
-                                   get_class($config['default']) === 'Piwik\API\NoDefaultValue';
+        if (!isset($method['parameters'])) {
+            return $properties;
+        }
 
-                $prop = [
-                    'type' => 'string',
-                ];
-
-                // Add description if available and not a translation key
-                if (isset($config['description']) &&
-                    !empty($config['description']) &&
-                    !preg_match('/^[A-Z][a-zA-Z]+_[a-zA-Z_]+$/', $config['description'])) {
-                    $prop['description'] = $config['description'];
-                }
-
-                // Add default value: use meaningful value if exists, otherwise empty string for optional params
-                if ($hasDefault &&
-                    !is_object($config['default']) &&
-                    $config['default'] !== null &&
-                    trim((string)$config['default']) !== '' &&
-                    strtolower(trim((string)$config['default'])) !== 'string') {
-                    // Has a meaningful default value
-                    $prop['default'] = $config['default'];
-                } elseif (!$isNoDefaultValue) {
-                    // Optional parameter with no meaningful default - set empty string
-                    $prop['default'] = '';
-                }
-
-                $properties[$parameter] = $prop;
+        foreach ($method['parameters'] as $parameter => $config) {
+            if (strpos($parameter, '_') === 0) {
+                continue;
             }
+            $properties[$parameter] = $this->buildPropertySchema($config, $parameter);
         }
 
         return $properties;
     }
 
-    private function getProperties($method)
+    private function buildPropertySchema($config, $name = null)
     {
-        $properties = [
-            "module" => [
-                "name" => "module",
-                "in" => "query",
-                "examples" => ["API"],
-                "schema" => [
-                    "type" => "string",
-                ]
-            ],
-            "format" => [
-                "name" => "format",
-                "in" => "query",
-                "examples" => [
-                    "json",
-                    "xml",
-                    "csv",
-                    "tsv",
-                    "html",
-                    "rss",
-                    "original"
-                ],
-                "schema" => [
-                    "type" => "string",
-                ]
-            ],
-            "method" => [
-                "name" => "method",
-                "in" => "query",
-                "examples" => [
-                    $method["method"]
-                ],
-                "schema" => [
-                    "type" => "string",
-                ]
-            ],
-        ];
+        $override = $name !== null ? $this->getKnownParameterOverride($name) : null;
 
-        if (isset($method['parameters'])) {
-            foreach ($method['parameters'] as $parameter => $config) {
-                $properties[$parameter] = [
-                    'name' => $parameter,
-                    'in' => 'query',
-                    'examples' => [
-                        '', '',
-                    ],
-                    'schema' => [
-                        'type' => 'string',
-                    ]
-                ];
+        if ($override !== null) {
+            $prop = $override;
+            $openApiType = $prop['type'] ?? 'string';
+        } else {
+            $openApiType = $this->mapPhpTypeToOpenApi($config['type'] ?? null);
+            $prop = ['type' => $openApiType];
+
+            if ($openApiType === 'array') {
+                $prop['items'] = ['type' => 'string'];
             }
         }
 
-        return $properties;
+        if (!empty($config['allowsNull']) && !isset($prop['nullable'])) {
+            $prop['nullable'] = true;
+        }
+
+        $hasDefault = array_key_exists('default', $config);
+        $isNoDefaultValue = $hasDefault
+            && is_object($config['default'])
+            && get_class($config['default']) === 'Piwik\\API\\NoDefaultValue';
+
+        $defaultValue = $hasDefault ? $config['default'] : null;
+        $hasMeaningfulDefault = $hasDefault
+            && !$isNoDefaultValue
+            && !is_object($defaultValue)
+            && $defaultValue !== null;
+
+        $overrideHasDefault = array_key_exists('default', $prop);
+
+        if ($hasMeaningfulDefault) {
+            $stringValue = is_array($defaultValue) ? '' : (string)$defaultValue;
+            $isPlaceholder = $stringValue !== '' && strtolower(trim($stringValue)) === 'string';
+
+            if ($isPlaceholder) {
+                if (!$isNoDefaultValue && !$overrideHasDefault) {
+                    $prop['default'] = $this->emptyDefaultFor($openApiType);
+                }
+            } elseif (!$overrideHasDefault) {
+                $prop['default'] = $this->coerceDefault($openApiType, $defaultValue);
+            }
+        } elseif (!$isNoDefaultValue && !$overrideHasDefault) {
+            $prop['default'] = $this->emptyDefaultFor($openApiType);
+        }
+
+        return $prop;
+    }
+
+    private function buildSuccessResponse()
+    {
+        return [
+            "description" => "Successful response. The actual content type is selected by the `format` query/body parameter, not by Accept negotiation.",
+            "content" => [
+                "application/json" => [
+                    "schema" => ["type" => "object"],
+                ],
+                "application/xml" => [
+                    "schema" => ["type" => "string"],
+                ],
+                "text/csv" => [
+                    "schema" => ["type" => "string"],
+                ],
+                "text/tab-separated-values" => [
+                    "schema" => ["type" => "string"],
+                ],
+                "text/html" => [
+                    "schema" => ["type" => "string"],
+                ],
+                "application/rss+xml" => [
+                    "schema" => ["type" => "string"],
+                ],
+                "application/octet-stream" => [
+                    "schema" => [
+                        "type" => "string",
+                        "description" => "Returned when format=original; the raw API return value, serialized.",
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    private function getKnownParameterOverride($name)
+    {
+        switch ($name) {
+            case 'period':
+                return [
+                    'type' => 'string',
+                    'enum' => ['day', 'week', 'month', 'year', 'range'],
+                    'default' => 'day',
+                    'description' => 'Aggregation period for the report.',
+                ];
+            case 'date':
+                return [
+                    'type' => 'string',
+                    'default' => 'today',
+                    'description' => 'Date for the report. Accepts: YYYY-MM-DD, a range "YYYY-MM-DD,YYYY-MM-DD", or a relative keyword (today, yesterday, lastN, previousN).',
+                    'example' => 'today',
+                ];
+            case 'idSite':
+            case 'idsite':
+                return [
+                    'type' => 'string',
+                    'description' => 'Site ID. Accepts a single integer, a comma-separated list (e.g. "1,2,3"), or "all".',
+                    'pattern' => '^([0-9]+(,[0-9]+)*|all)$',
+                    'example' => '1',
+                ];
+            case 'idSites':
+                return [
+                    'type' => 'string',
+                    'description' => 'Comma-separated list of site IDs, a single integer, or "all".',
+                    'pattern' => '^([0-9]+(,[0-9]+)*|all)$',
+                    'example' => '1',
+                ];
+            case 'segment':
+                return [
+                    'type' => 'string',
+                    'description' => 'Matomo segment expression, e.g. "browserCode==FF;countryCode==US". See https://developer.matomo.org/api-reference/reporting-api-segmentation',
+                    'default' => '',
+                ];
+            case 'language':
+                return [
+                    'type' => 'string',
+                    'description' => 'ISO 639-1 language code (e.g. "en", "fr").',
+                    'pattern' => '^[a-z]{2}(-[A-Za-z]{2,4})?$',
+                ];
+            default:
+                return null;
+        }
+    }
+
+    private function emptyDefaultFor($openApiType)
+    {
+        if ($openApiType === 'array') {
+            return [];
+        }
+        return '';
+    }
+
+    private function coerceDefault($openApiType, $value)
+    {
+        switch ($openApiType) {
+            case 'integer':
+                return (int)$value;
+            case 'boolean':
+                return (bool)$value;
+            case 'number':
+                return (float)$value;
+            case 'array':
+                return is_array($value) ? $value : [];
+            default:
+                return is_array($value) ? '' : (string)$value;
+        }
     }
 }

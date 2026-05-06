@@ -1,24 +1,24 @@
 {
     "name": "Swagger",
     "description": "Matomo reporting API documentation with Swagger/OpenAPI",
-    "version": "5.2.5",
+    "version": "5.3.0",
     "theme": false,
     "require": {
-        "matomo": ">=5.0.0,<6.0.0-b1"
+        "matomo": ">=5.10.0,<6.0.0-b1"
     },
     "authors": [
         {
             "name": "Openmost",
-            "email": "ronan@openmost.io",
-            "homepage": "https:\/\/openmost.io"
+            "email": "ronan@openmost.com",
+            "homepage": "https:\/\/openmost.com"
         }
     ],
     "support": {
-        "email": "ronan@openmost.io",
+        "email": "ronan@openmost.com",
         "issues": "https:\/\/github.com\/openmost\/Swagger\/issues",
         "source": "https:\/\/github.com\/openmost\/Swagger"
     },
-    "homepage": "https:\/\/openmost.io\/products\/swagger\/",
+    "homepage": "https:\/\/openmost.com\/products\/swagger\/",
     "license": "GPL v3+",
     "keywords": [
         "swagger",

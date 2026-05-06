@@ -1,5 +1,18 @@
 ## Changelog
 
+### v5.3.0
+
+**Richer OpenAPI document**
+
+- Tags now carry the module description from each plugin's API class and an `externalDocs` link to the plugin homepage when available.
+- Parameter schemas use real PHP types (`int → integer`, `bool → boolean`, `float → number`, `array → array`) instead of treating every input as a string. Nullable parameters are flagged with `nullable: true`.
+- Per-method request body examples are generated from Matomo's own `DocumentationGenerator::getExampleUrl()`, so "Try it out" comes prefilled with sensible values.
+- Well-known Matomo parameters get domain-aware schemas: `period` is an `enum` (day/week/month/year/range), `idSite`/`idSites` get a regex matching integer / comma-separated list / "all", `date` and `segment` get human-readable descriptions of their accepted shapes, and `language` gets a locale pattern.
+- The 200 response now lists every format Matomo can return (`json`, `xml`, `csv`, `tsv`, `html`, `rss`, `original`) instead of only `application/json`, with a description noting that the concrete content type is selected via the `format` parameter.
+- `info.contact` and `info.license` populated from the plugin manifest.
+- Internal parameters (names starting with `_`) are now hidden, matching Matomo's reference doc generator.
+- Required parameter detection fixed (the previous check always evaluated to false because of an `is_object()` on a class-name string).
+
 ### v5.2.5
 
 fix: scope CSP `frame-src 'self'` and `img-src validator.swagger.io` to the Swagger pages only. The previous global decoration applied them to every Matomo page and broke the Overlay feature, which iframes cross-origin tracked sites.

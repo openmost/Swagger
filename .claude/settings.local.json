@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:forum.matomo.org)"
+      "WebFetch(domain:forum.matomo.org)",
+      "Bash(php *)"
     ]
   }
 }
