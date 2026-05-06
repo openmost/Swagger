@@ -27,6 +27,8 @@ class Controller extends \Piwik\Plugin\Controller
     {
         Piwik::checkUserHasSuperUserAccess();
 
+        $this->securityPolicy->addPolicy('frame-src', "'self'");
+
         return $this->renderTemplate('index', array(
             'title' => 'Swagger',
             'categoryTitle' => 'Administration'
@@ -37,6 +39,8 @@ class Controller extends \Piwik\Plugin\Controller
     public function iframe()
     {
         Piwik::checkUserHasSuperUserAccess();
+
+        $this->securityPolicy->addPolicy('img-src', 'validator.swagger.io');
 
         // Use absolute URL to avoid CORS issues
         $openapi_url = \Piwik\Url::getCurrentUrlWithoutFileName() . "?module=API&format=json&method=Swagger.getOpenApi";

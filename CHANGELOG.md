@@ -1,5 +1,9 @@
 ## Changelog
 
+### v5.2.5
+
+fix: scope CSP `frame-src 'self'` and `img-src validator.swagger.io` to the Swagger pages only. The previous global decoration applied them to every Matomo page and broke the Overlay feature, which iframes cross-origin tracked sites.
+
 ### v5.2.3
 
 fix: Authorization modal position in iframe view

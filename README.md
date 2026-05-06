@@ -2,40 +2,65 @@
 
 ## Description
 
-Read and interact with Matomo API through Swagger UI with full OpenAPI 3.1.0 compliance.
+Explore and try every Matomo Reporting API method straight from your admin panel, powered by Swagger UI and a fully OpenAPI 3.1.0 compliant specification.
 
-This plugin brings the OpenAPI standard to your Matomo Instance, providing a complete, interactive API documentation that automatically discovers all installed plugins and their API methods.
+The plugin scans your Matomo installation in real time, picks up every activated plugin's API methods, and exposes them as an interactive, browsable documentation. No static files to maintain, no manual sync after installing or removing a plugin: the spec is generated dynamically from the live container.
 
-## Features
+It is designed for developers integrating against Matomo, support engineers debugging a customer's setup, and anyone who would rather click "Try it out" than craft `curl` commands by hand.
 
-- **OpenAPI 3.1.0 Compliant**: Full specification compliance with proper schemas, parameters, and responses
-- **Dynamic API Discovery**: Automatically detects all installed and activated plugins
-- **Interactive Documentation**: Test API calls directly from the Swagger UI
-- **Modern Authentication**: Bearer token authentication support
-- **Flexible Protocol Support**: Works with both HTTP and HTTPS installations
-- **POST Method Support**: Compatible with POST-only API token restrictions
-- **Real-time Updates**: No manual configuration needed when plugins are installed/removed
-- **Clean UI**: Optimized interface for better user experience
+## What you get
+
+- A `Swagger` entry under **Administration → Platform**, restricted to Super Users.
+- An OpenAPI 3.1.0 document served at `?module=API&format=json&method=Swagger.getOpenApi`, suitable for importing into Postman, Insomnia, or any OpenAPI tooling.
+- Bearer token authentication that mirrors how Matomo expects API tokens to be sent today (the deprecated `token_auth` query parameter is not used).
+- POST as the default verb for every endpoint, so the plugin keeps working even when your token is restricted to POST-only.
+- Method names visible inside endpoint paths, so the operation list reads like a table of contents instead of a wall of identical URLs.
 
 ## Requirements
 
-- Matomo 4.0 or higher
-- Super User access to view and use the Swagger UI
-- Valid Matomo API token for authentication
+- Matomo 5.0 or later (tested up to the current 5.x line).
+- A Super User account: lower roles will get a 401 when opening the Swagger page.
+- A Matomo API token with the permissions matching the calls you want to make.
 
-## Quick Start
+## Installation
 
-1. Install the plugin from the Matomo Marketplace
-2. Navigate to **Administration > Platform > Swagger**
-3. Click **Authorize** and enter your Matomo API token
-4. Browse and test any API endpoint from your installed plugins
+Install from the Matomo Marketplace, or drop the plugin folder into `plugins/Swagger` and activate it from **Administration → Platform → Plugins**. No database migration runs; deactivating the plugin leaves no residue.
 
-## Authentication
+## Using it
 
-The plugin uses Bearer token authentication. To authenticate:
+1. Open **Administration → Platform → Swagger**.
+2. Click **Authorize** and paste a Matomo API token (find one under **Administration → Personal → Security**).
+3. Pick an endpoint, expand it, fill in the parameters, and hit **Try it out**.
 
-1. Click the **Authorize** button in Swagger UI
-2. Enter your Matomo API token (found in **Administration > Platform > API**)
-3. Click **Authorize** to save
+The token is sent as `Authorization: Bearer <your token>` on every request. It stays in browser memory for the session and is not persisted by the plugin.
 
-Your token will be sent as: `Authorization: Bearer YOUR_TOKEN`
+## How it works
+
+The Swagger page is a thin admin shell that embeds Swagger UI in a same-origin iframe. The iframe loads the bundled Swagger UI assets (under `swagger-ui/`) and points them at the dynamically generated OpenAPI document.
+
+The OpenAPI document is built on demand by walking Matomo's API proxy: every loaded plugin contributes its public methods, with parameter names, defaults, and required flags inferred from method signatures and the existing API documentation generator. Because discovery happens at request time, enabling a plugin makes its methods appear immediately, with no rebuild step.
+
+A small CSP adjustment is applied only on the two Swagger controller actions: `frame-src 'self'` for the parent admin page (so the same-origin iframe is allowed) and `img-src validator.swagger.io` for the iframe (so the Swagger UI validator badge can load). These directives are scoped per-response and do not leak onto other Matomo pages.
+
+## Security notes
+
+- The plugin never stores tokens. Anything you type into the Authorize dialog lives in the browser tab.
+- All page actions check `Piwik::checkUserHasSuperUserAccess()` before rendering.
+- The OpenAPI document itself describes the API surface only; it does not expose credentials, configuration values, or per-site data.
+
+## Troubleshooting
+
+- **Blank iframe or "refused to connect"**: another plugin or a custom CSP rule has overridden `frame-src`. Check `core/View/SecurityPolicy.php` decorators in your other plugins.
+- **401 on every call**: the token used in Authorize has been revoked or lacks permissions for the target site. Generate a new one under **Personal → Security**.
+- **A plugin's methods are missing**: confirm the plugin is activated. The OpenAPI document only lists methods from plugins currently registered with Matomo's plugin manager.
+- **Endpoint hangs in "Try it out"**: usually a server-side timeout on a heavy report. Try the same call with a narrower `period`/`date` first.
+
+## Support
+
+- Issues and feature requests: https://github.com/openmost/Swagger/issues
+- Commercial support and integration help: ronan@openmost.io
+- Plugin homepage: https://openmost.io/products/swagger/
+
+## License
+
+GPL v3 or later. Swagger UI is bundled under its own Apache 2.0 license; see `swagger-ui/` for details.
