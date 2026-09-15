@@ -1,0 +1,6 @@
+node_modules
+.idea
+.claude
+/vue/dist/*.umd.js
+/vue/dist/*.common.js
+/vue/dist/*.map

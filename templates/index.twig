@@ -1,31 +1,7 @@
 {% extends 'admin.twig' %}
 
+{% set title = 'Swagger_PageTitle'|translate %}
+
 {% block content %}
-    <script>
-      function resizeIframe(obj) {
-        try {
-          setInterval(() => {
-            obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px';
-          }, 500);
-        } catch(e) {
-          // If cross-origin access is blocked, fallback to fixed height
-          console.log('Unable to auto-resize iframe:', e);
-        }
-      }
-    </script>
-
-    <div class="swagger-page-wrapper">
-        <iframe src="index.php?module=Swagger&action=iframe" width="100%" onload="resizeIframe(this);"></iframe>
-    </div>
-
-    <style>
-        .swagger-page-wrapper {
-            display: flex;
-        }
-
-        .swagger-page-wrapper iframe {
-            width: 100%;
-            min-height: 500px;
-        }
-    </style>
+    <div vue-entry="CoreHome.ClientWidgetRenderer" widget="{{ widget|json_encode }}"></div>
 {% endblock %}

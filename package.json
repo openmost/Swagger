@@ -1,0 +1,16 @@
+{
+  "name": "matomo-swagger",
+  "private": true,
+  "description": "Build dependencies of the Swagger Vue library (Swagger UI)",
+  "dependencies": {
+    "swagger-ui-dist": "^5.32.15"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "peerDependenciesMeta": {
+    "vue": {
+      "optional": true
+    }
+  }
+}

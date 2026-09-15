@@ -1,5 +1,42 @@
 ## Changelog
 
+### v6.0.0
+
+**Matomo 6 compatibility**
+
+- Requires Matomo 6 (`>=6.0.0-b1,<7.0.0-b1`) and PHP 8.1+.
+- The Swagger page is a Vue component built with Vite. Twig iframe templates and the vendored `swagger-ui/` folder are removed.
+- Swagger UI updated from 3.34 to 5.32, bundled with the plugin and only loaded on the Swagger page.
+- Swagger UI is rendered in a shadow root instead of an iframe: no more height polling, the Authorize modal is positioned normally, and Matomo and Swagger UI styles no longer conflict. Dark mode follows the Matomo theme.
+
+**New features**
+
+- "Try it out" requests use the current Matomo session by default, no API token needed. A token entered with Authorize still takes precedence.
+- Download the OpenAPI JSON from the Swagger page.
+- Search field to filter API modules.
+- New "Swagger API explorer" widget (About Matomo category), embeddable with the Widgetize module.
+- Operation summaries and descriptions read from the method docblocks.
+- Generic report parameters documented on report methods (`filter_limit`, `filter_offset`, `filter_sort_column`, `filter_sort_order`, `filter_pattern`, `showColumns`, `hideColumns`, `flat`, `format_metrics`, `percent_of_total`).
+- English and French translations.
+
+**Fixes**
+
+- `Swagger.getOpenApi` now requires Super User access. The specification was previously readable anonymously.
+- Server URL now includes the Matomo subfolder, so "Try it out" works when Matomo is not installed at the domain root. Swagger UI assets no longer use root-absolute paths either.
+- Removed the `application/json` request body: the Matomo API ignores parameters sent as JSON.
+- Removed the demo.matomo.cloud server, which could not be called from the browser.
+- Array parameters are sent as `name[]` fields so PHP reads them as arrays.
+- Optional parameters no longer get empty default values, so Swagger UI does not send empty fields.
+- Untyped flags use `0` / `1` values, since PHP reads the string `false` as true.
+- Removed `nullable`, which is not part of OpenAPI 3.1.
+- Generation errors are returned as API errors instead of an error document exposing file paths.
+- Plugin homepage and contact updated to openmost.com.
+
+**Breaking changes**
+
+- The `index.php?module=Swagger&action=iframe` URL is removed. Embed the Swagger API explorer widget with the Widgetize module instead.
+- `Swagger.getOpenApi` requires Super User access.
+
 ### v5.3.0
 
 **Richer OpenAPI document**

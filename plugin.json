@@ -1,10 +1,10 @@
 {
     "name": "Swagger",
-    "description": "Matomo reporting API documentation with Swagger/OpenAPI",
-    "version": "5.3.0",
+    "description": "Explore and try the Matomo Reporting API from your admin panel, with Swagger UI and an OpenAPI 3.1 specification generated from your activated plugins",
+    "version": "6.0.0",
     "theme": false,
     "require": {
-        "matomo": ">=5.10.0,<6.0.0-b1"
+        "matomo": ">=6.0.0-b1,<7.0.0-b1"
     },
     "authors": [
         {
@@ -18,14 +18,16 @@
         "issues": "https:\/\/github.com\/openmost\/Swagger\/issues",
         "source": "https:\/\/github.com\/openmost\/Swagger"
     },
-    "homepage": "https:\/\/openmost.com\/products\/swagger\/",
+    "homepage": "https:\/\/openmost.com\/matomo\/extensions\/swagger",
     "license": "GPL v3+",
     "keywords": [
         "swagger",
         "openapi",
         "api",
         "reporting",
-        "rest"
+        "rest",
+        "developer",
+        "documentation"
     ],
     "category": "development"
 }

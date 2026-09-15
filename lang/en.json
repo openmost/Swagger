@@ -1,0 +1,11 @@
+{
+    "Swagger": {
+        "PageTitle": "Swagger API explorer",
+        "WidgetName": "Swagger API explorer",
+        "Intro": "Browse and try every Reporting API method of this Matomo. The specification is generated from the activated plugins.",
+        "UseSession": "Send requests with my current Matomo session",
+        "UseSessionHelp": "Try API methods without pasting a token. To test with a specific API token, disable this option and use the Authorize button.",
+        "DownloadSpec": "Download OpenAPI JSON",
+        "LoadingSpec": "Generating the OpenAPI specification..."
+    }
+}
