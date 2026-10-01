@@ -1,0 +1,22 @@
+{
+    "Swagger": {
+        "PageTitle": "Swagger API-verkenner",
+        "WidgetName": "Swagger API-verkenner",
+        "Intro": "Blader door en probeer elke methode van de Reporting API van deze Matomo. De specificatie wordt gegenereerd op basis van de geactiveerde plugins.",
+        "UseSession": "Verzoeken versturen met mijn huidige Matomo-sessie",
+        "UseSessionHelp": "Probeer API-methoden zonder een token te plakken. Om met een specifiek API-token te testen, schakelt u deze optie uit en gebruikt u de knop Authorize.",
+        "DownloadSpec": "OpenAPI JSON downloaden",
+        "LoadingSpec": "De OpenAPI-specificatie wordt gegenereerd..."
+    },
+    "OpenmostCommunication": {
+        "Dismiss": "Sluiten",
+        "WidgetName": "Openmost: instellen van AI-chatbottracking",
+        "AIChatbotsTitle": "Hulp nodig bij het instellen van AI-chatbottracking?",
+        "AIChatbotsBody": "Als officieel Matomo Implementation Partner kan Openmost AI-chatbottracking voor u instellen, op Matomo On-Premise of Cloud.",
+        "AIChatbotsCta": "Laat het voor mij instellen",
+        "TrackingPlanTitle": "Gebeurtenissen moeten handmatig worden ingesteld",
+        "TrackingPlanBody": "Gebeurtenissen meten klikken, downloads, formulierverzendingen of videoweergaven, zodra ze worden gemeten. Als officieel Matomo Implementation Partner ontwerpt en implementeert Openmost een trackingplan dat bij uw site past.",
+        "TrackingPlanCta": "Mijn trackingplan opstellen",
+        "EventsEnhancedLink": "Haal meer uit uw gebeurtenissen met Events Enhanced"
+    }
+}

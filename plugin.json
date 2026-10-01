@@ -1,7 +1,7 @@
 {
     "name": "Swagger",
-    "description": "Explore and try the Matomo Reporting API from your admin panel, with Swagger UI and an OpenAPI 3.1 specification generated from your activated plugins",
-    "version": "6.0.0",
+    "description": "Explore and try every Matomo API method in Swagger UI, from an OpenAPI 3.1 spec of your plugins.",
+    "version": "6.0.1",
     "theme": false,
     "require": {
         "matomo": ">=6.0.0-b1,<7.0.0-b1"
@@ -10,15 +10,18 @@
         {
             "name": "Openmost",
             "email": "ronan@openmost.com",
-            "homepage": "https:\/\/openmost.com"
+            "homepage": "https://openmost.com"
         }
     ],
     "support": {
         "email": "ronan@openmost.com",
-        "issues": "https:\/\/github.com\/openmost\/Swagger\/issues",
-        "source": "https:\/\/github.com\/openmost\/Swagger"
+        "issues": "https://github.com/openmost/Swagger/issues",
+        "source": "https://github.com/openmost/Swagger"
     },
-    "homepage": "https:\/\/openmost.com\/matomo\/extensions\/swagger",
+    "homepage": "https://openmost.com/matomo/extensions/swagger",
+    "preview": {
+        "video_url": "https://www.youtube-nocookie.com/embed/3M1a4jgxHcU"
+    },
     "license": "GPL v3+",
     "keywords": [
         "swagger",

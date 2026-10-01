@@ -1,5 +1,9 @@
 ## Changelog
 
+### v6.0.1
+
+- 10 more languages: Arabic, Chinese (Simplified), Chinese (Traditional), Dutch, German, Italian, Japanese, Polish, Portuguese and Spanish (12 in total).
+
 ### v6.0.0
 
 **Matomo 6 compatibility**

@@ -1,0 +1,22 @@
+{
+    "Swagger": {
+        "PageTitle": "Explorador da API Swagger",
+        "WidgetName": "Explorador da API Swagger",
+        "Intro": "Explore e experimente todos os métodos da Reporting API deste Matomo. A especificação é gerada a partir das extensões ativadas.",
+        "UseSession": "Enviar os pedidos com a minha sessão Matomo atual",
+        "UseSessionHelp": "Experimente os métodos da API sem colar um token. Para testar com um token de API específico, desative esta opção e use o botão Authorize.",
+        "DownloadSpec": "Descarregar o JSON OpenAPI",
+        "LoadingSpec": "A gerar a especificação OpenAPI..."
+    },
+    "OpenmostCommunication": {
+        "Dismiss": "Dispensar",
+        "WidgetName": "Openmost: configuração do seguimento de chatbots de IA",
+        "AIChatbotsTitle": "Precisa de ajuda para configurar o seguimento de chatbots de IA?",
+        "AIChatbotsBody": "Como Implementation Partner oficial da Matomo, a Openmost pode configurar o seguimento de chatbots de IA por si, no Matomo On-Premise ou Cloud.",
+        "AIChatbotsCta": "Pedir a configuração",
+        "TrackingPlanTitle": "Os eventos têm de ser configurados manualmente",
+        "TrackingPlanBody": "Os eventos medem cliques, transferências, envios de formulários ou reproduções de vídeo, desde que sejam seguidos. Como Implementation Partner oficial da Matomo, a Openmost concebe e implementa um plano de marcação adaptado ao seu site.",
+        "TrackingPlanCta": "Criar o meu plano de marcação",
+        "EventsEnhancedLink": "Tire mais partido dos seus eventos com o Events Enhanced"
+    }
+}
