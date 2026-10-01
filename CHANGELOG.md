@@ -5,6 +5,7 @@
 - "Try it out" now works when Matomo is installed in a subdirectory: the server URL keeps the installation path, and the Swagger UI assets no longer use root-absolute paths.
 - Security: `Swagger.getOpenApi` is restricted to super users again, as in v6. The Swagger page loads the document with the session of the logged in user.
 - The OpenAPI document contact points to openmost.com and ronan@openmost.com.
+- Smaller package: only the Swagger UI files that the explorer loads are shipped (bundle, standalone preset and stylesheet), without the unused alternate bundles, demo page and source maps.
 
 ### v5.3.0
 
