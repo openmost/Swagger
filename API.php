@@ -30,7 +30,7 @@ class API extends \Piwik\Plugin\API
 
     public function getOpenApi()
     {
-        // Piwik::checkUserHasSuperUserAccess();
+        Piwik::checkUserHasSuperUserAccess();
 
         $this->ensureAllPluginsRegistered();
 
@@ -125,8 +125,8 @@ class API extends \Piwik\Plugin\API
             "version" => Version::VERSION,
             "contact" => [
                 "name" => "Openmost",
-                "url" => "https://openmost.io/products/swagger/",
-                "email" => "ronan@openmost.io",
+                "url" => "https://openmost.com/matomo/extensions/swagger",
+                "email" => "ronan@openmost.com",
             ],
             "license" => [
                 "name" => "GPL v3+",
@@ -145,12 +145,12 @@ class API extends \Piwik\Plugin\API
 
     private function getServers()
     {
-        $host = Url::getHost();
-        $scheme = Url::getCurrentScheme();
+        // Keeps the path Matomo is installed in, so "Try it out" also works from a subdirectory
+        $url = rtrim((string) Url::getCurrentUrlWithoutFileName(), '/');
 
         return [
             [
-                "url" => "$scheme://$host",
+                "url" => $url !== '' ? $url : '/',
                 "description" => "This Matomo server",
             ],
             [

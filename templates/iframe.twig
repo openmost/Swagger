@@ -1,17 +1,43 @@
 <div id="swagger-ui"></div>
 
 <!-- Load Swagger UI styles -->
-<link rel="stylesheet" href="/plugins/Swagger/swagger-ui/dist/swagger-ui.css">
+<link rel="stylesheet" href="plugins/Swagger/swagger-ui/dist/swagger-ui.css">
 
 <!-- Load Swagger UI scripts -->
-<script src="/plugins/Swagger/swagger-ui/dist/swagger-ui-bundle.js"></script>
-<script src="/plugins/Swagger/swagger-ui/dist/swagger-ui-standalone-preset.js"></script>
+<script src="plugins/Swagger/swagger-ui/dist/swagger-ui-bundle.js"></script>
+<script src="plugins/Swagger/swagger-ui/dist/swagger-ui-standalone-preset.js"></script>
 
 <!-- Init Swagger UI -->
 <script>
   window.onload = () => {
+    const body = new URLSearchParams({
+      token_auth: '{{ token_auth|e('js') }}',
+      force_api_session: '1',
+    });
+
+    fetch('{{ openapi_url|e('js') }}', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    })
+      .then((response) => response.json())
+      .then((spec) => {
+        if (!spec || spec.result === 'error') {
+          throw new Error(spec && spec.message ? spec.message : 'The OpenAPI document could not be loaded.');
+        }
+        renderSwaggerUi(spec);
+      })
+      .catch((error) => {
+        const container = document.getElementById('swagger-ui');
+        container.textContent = error.message;
+        container.className = 'swagger-ui-error';
+      });
+  };
+
+  function renderSwaggerUi(spec) {
     window.ui = SwaggerUIBundle({
-      url: '{{ openapi_url|raw }}',
+      spec: spec,
       dom_id: '#swagger-ui',
       presets: [
         SwaggerUIBundle.presets.apis,
@@ -19,12 +45,18 @@
       ],
       layout: "StandaloneLayout",
     });
-  };
+  }
 </script>
 
 <style>
     body {
         margin: 0;
+    }
+
+    .swagger-ui-error {
+        padding: 16px;
+        font-family: sans-serif;
+        color: #d4291f;
     }
 
     .swagger-ui .dialog-ux .modal-ux {

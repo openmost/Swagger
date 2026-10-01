@@ -45,8 +45,10 @@ class Controller extends \Piwik\Plugin\Controller
         // Use absolute URL to avoid CORS issues
         $openapi_url = \Piwik\Url::getCurrentUrlWithoutFileName() . "?module=API&format=json&method=Swagger.getOpenApi";
 
+        // getOpenApi is restricted to super users, so the spec is requested with the session of the user
         return $this->renderTemplate('iframe', array(
             'openapi_url' => $openapi_url,
+            'token_auth' => Piwik::getCurrentUserTokenAuth(),
         ));
     }
 }
