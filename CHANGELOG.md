@@ -2,7 +2,7 @@
 
 ### v5.3.1
 
-- Requires Matomo 5.0.0 or higher again (`>=5.0.0,<6.0.0-b1`), instead of 5.10.0: nothing in the plugin needs Matomo 5.10, and the Openmost banner styles fall back to the Matomo light theme colors when the theme color variables are not available.
+- Requires Matomo 5.0.0 or higher again (`>=5.0.0,<6.0.0-b1`), instead of 5.10.0: nothing in the plugin needs Matomo 5.10.
 - "Try it out" now works when Matomo is installed in a subdirectory: the server URL keeps the installation path, and the Swagger UI assets no longer use root-absolute paths.
 - Security: `Swagger.getOpenApi` is restricted to super users again, as in v6. The Swagger page loads the document with the session of the logged in user.
 - The OpenAPI document contact points to openmost.com and ronan@openmost.com.
