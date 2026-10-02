@@ -2,7 +2,7 @@
 
 **Which Matomo versions are supported?**
 
-Version 5.x of the plugin supports Matomo 5.10.0 or higher. For Matomo 6, install version 6.x of the plugin, which also lets you try the API with your Matomo session, without a token.
+Version 5.x of the plugin supports Matomo 5.0.0 or higher. For Matomo 6, install version 6.x of the plugin, which also lets you try the API with your Matomo session, without a token.
 
 **Who can use the API explorer?**
 

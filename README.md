@@ -17,7 +17,7 @@ The session-based "Try it out", the search field, the one-click download, the wi
 
 ## Requirements
 
-- Matomo 5.10.0 or higher (`>=5.10.0,<6.0.0-b1`)
+- Matomo 5.0.0 or higher (`>=5.0.0,<6.0.0-b1`)
 - A Super User account
 - A Matomo API token with the permissions matching the calls you want to make
 
