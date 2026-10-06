@@ -3,6 +3,7 @@
 ### v6.0.1
 
 - 10 more languages: Arabic, Chinese (Simplified), Chinese (Traditional), Dutch, German, Italian, Japanese, Polish, Portuguese and Spanish (12 in total).
+- README: the plugin description now shows in the Description tab of the Matomo Marketplace.
 
 ### v6.0.0
 
