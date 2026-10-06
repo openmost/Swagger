@@ -7,6 +7,7 @@
 - Security: `Swagger.getOpenApi` is restricted to super users again, as in v6. The Swagger page loads the document with the session of the logged in user.
 - The OpenAPI document contact points to openmost.com and ronan@openmost.com.
 - Smaller package: only the Swagger UI files that the explorer loads are shipped (bundle, standalone preset and stylesheet), without the unused alternate bundles, demo page and source maps.
+- README: the plugin description now shows in the Description tab of the Matomo Marketplace.
 
 ### v5.3.0
 
