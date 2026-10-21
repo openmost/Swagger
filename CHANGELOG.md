@@ -1,5 +1,9 @@
 ## Changelog
 
+### v5.3.2
+
+- Request parameters are read with `Piwik\Request` instead of the deprecated `Common::getRequestVar`, ready for the next Matomo versions.
+
 ### v5.3.1
 
 - Requires Matomo 5.0.0 or higher again (`>=5.0.0,<6.0.0-b1`), instead of 5.10.0: nothing in the plugin needs Matomo 5.10.
