@@ -1,5 +1,9 @@
 ## Changelog
 
+### v6.0.2
+
+- Request parameters are read with `Piwik\Request` instead of the deprecated `Common::getRequestVar`, ready for the next Matomo versions.
+
 ### v6.0.1
 
 - 10 more languages: Arabic, Chinese (Simplified), Chinese (Traditional), Dutch, German, Italian, Japanese, Polish, Portuguese and Spanish (12 in total).
